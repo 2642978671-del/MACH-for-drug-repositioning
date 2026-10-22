@@ -17,11 +17,12 @@ Parts of the implementation build on [AdaDR](https://github.com/xinliangSun/AdaD
 
 ## Input data
 
-Obtain the four benchmark matrices from the [AdaDR data release](https://github.com/xinliangSun/AdaDR), subject to its terms. Place its `raw_data/drug_data` folder anywhere accessible, then from this repository's root run:
+Obtain the four benchmark matrices from the [AdaDR data release](https://github.com/xinliangSun/AdaDR), subject to its terms. From this repository's root, one way to stage all four is:
 
 ```bash
+git clone --depth 1 https://github.com/xinliangSun/AdaDR.git ../AdaDR
 python prepare_benchmarks.py published \
-  --source /path/to/AdaDR/raw_data/drug_data \
+  --source ../AdaDR/AdaDR/raw_data/drug_data \
   --output raw_data/drug_data
 ```
 
