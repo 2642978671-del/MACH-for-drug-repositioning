@@ -28,6 +28,18 @@ python prepare_benchmarks.py published \
 
 The validator checks binary association labels and similarity-matrix dimensions. Gdataset and Cdataset use MAT files, LRSSL uses tab-delimited matrices, and Ldataset uses the `lagcn` CSV matrices. Data files are intentionally excluded from this repository; the published similarity matrices are used as supplied. Their upstream construction has not been independently reconstructed here.
 
+For a user-prepared dataset, supply three numeric CSV files without headers: a binary drug-by-disease association matrix, a square drug-by-drug similarity matrix, and a square disease-by-disease similarity matrix. The converter validates their dimensions and writes the MAT format used by the `Gdataset` loader:
+
+```bash
+python prepare_benchmarks.py custom \
+  --association my_associations.csv \
+  --drug-sim my_drug_similarity.csv \
+  --disease-sim my_disease_similarity.csv \
+  --output raw_data/drug_data/Gdataset/Gdataset.mat
+```
+
+The trainer currently selects its input path by dataset name, so this command uses the `Gdataset` input path. Run it in a separate checkout if you also need to retain the published Gdataset file. For custom matrices, keep a separate row/column-to-entity mapping; the converter preserves matrix order but does not create drug or disease names. It does not calculate similarity matrices from raw compounds or disease records.
+
 ## Environment
 
 The local CPU import/smoke environment used Python 3.12.7, PyTorch 2.3.0, DGL 2.2.1, torchdata 0.7.1 and the versions in [`requirements.txt`](requirements.txt). For an AutoDL Linux host with an NVIDIA GPU and a CUDA 12.1-compatible driver, run:
@@ -56,6 +68,6 @@ The four JSON files are copied from the selected full-model run records. `LRSSL`
 
 ## Evaluation scope and later release
 
-The loader creates a shuffled, stratified-by-label pair split with `KFold(n_splits=10, shuffle=True, random_state=1024)` for each label, and combines matching folds. Fold test pairs are withheld from that fold's training topology; all drug/disease nodes and supplied similarity matrices remain available. These runs assess transductive pair prediction. Because the released similarity matrices' construction from labels has not been verified, an evaluation designed to eliminate that possible path needs fold-specific similarity construction. The selected parameters were developed within the cross-validation workflow; this rerun alone is a reproducibility check, not a new independent model-selection estimate.
+The loader creates a shuffled, stratified-by-label pair split with `KFold(n_splits=10, shuffle=True, random_state=1024)` for each label, and combines matching folds. Fold test pairs are withheld from that fold's training topology; all drug/disease nodes and supplied similarity matrices remain available. The fixed-epoch run uses no validation set. Each completed fold writes its `outer_train.csv` and `outer_test.csv` pair tables. These runs assess transductive pair prediction rather than performance on unseen drugs or diseases. Because the released similarity matrices' construction from labels has not been verified, an evaluation designed to eliminate that possible path needs fold-specific similarity construction. The selected parameters were developed within the cross-validation workflow; this rerun alone is a reproducibility check, not a new independent model-selection estimate.
 
 
